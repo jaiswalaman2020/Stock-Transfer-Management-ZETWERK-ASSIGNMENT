@@ -83,9 +83,7 @@ npm run dev:frontend
 Frontend: `http://localhost:5173`
 Backend: `http://localhost:5000`
 
-Optional health check:
 
-`GET http://localhost:5000/api/health`
 
 ## API Endpoints
 
@@ -122,9 +120,8 @@ Optional health check:
 
 ## Deliverables
 
-- Live Application URL: _To be added after deployment_
-- GitHub Repository Link: _To be added after push_
-
+- Live Application URL: Will add later
+- GitHub Repository Link: https://github.com/jaiswalaman2020/Stock-Transfer-Management-ZETWERK-ASSIGNMENT
 ## Useful Scripts
 
 Root:
