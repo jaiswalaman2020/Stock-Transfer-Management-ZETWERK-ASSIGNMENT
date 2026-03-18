@@ -6,6 +6,7 @@
     "install:all": "npm --prefix frontend install && npm --prefix backend install",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:backend": "npm --prefix backend run dev",
+    "start:frontend:prod": "npm --prefix frontend run start:prod",
     "build:frontend": "npm --prefix frontend run build",
     "build:backend": "npm --prefix backend run build",
     "build": "npm run build:frontend",
