@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import mongoose from "mongoose";
 import {
   TransferRequest,
-  TRANSFER_STATUSES,
   type TransferStatus,
 } from "../models/TransferRequest.ts";
 import { Warehouse } from "../models/Warehouse.ts";
@@ -12,10 +11,6 @@ const allowedTransitions: Record<TransferStatus, TransferStatus[]> = {
   pending: ["approved"],
   approved: [],
 };
-
-function isTransferStatus(value: string): value is TransferStatus {
-  return TRANSFER_STATUSES.includes(value as TransferStatus);
-}
 
 async function applyStockMovementOnCompletion(
   sourceWarehouseId: mongoose.Types.ObjectId,
@@ -70,34 +65,11 @@ export async function createTransfer(
   try {
     const { sourceWarehouse, destinationWarehouse, quantity, note } =
       req.body as {
-        sourceWarehouse?: string;
-        destinationWarehouse?: string;
-        quantity?: number;
+        sourceWarehouse: string;
+        destinationWarehouse: string;
+        quantity: number;
         note?: string;
       };
-
-    if (
-      !sourceWarehouse ||
-      !destinationWarehouse ||
-      !mongoose.Types.ObjectId.isValid(sourceWarehouse) ||
-      !mongoose.Types.ObjectId.isValid(destinationWarehouse)
-    ) {
-      throw createHttpError(
-        400,
-        "Valid sourceWarehouse and destinationWarehouse are required.",
-      );
-    }
-
-    if (sourceWarehouse === destinationWarehouse) {
-      throw createHttpError(
-        400,
-        "Source and destination warehouses must be different.",
-      );
-    }
-
-    if (quantity === undefined || quantity <= 0) {
-      throw createHttpError(400, "quantity must be greater than 0.");
-    }
 
     const [source, destination] = await Promise.all([
       Warehouse.findById(sourceWarehouse),
@@ -132,19 +104,8 @@ export async function updateTransferStatus(
   next: (error?: Error) => void,
 ) {
   try {
-    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const { status } = req.body as { status?: string };
-
-    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-      throw createHttpError(400, "Invalid transfer id.");
-    }
-
-    if (!status || !isTransferStatus(status)) {
-      throw createHttpError(
-        400,
-        `status must be one of: ${TRANSFER_STATUSES.join(", ")}`,
-      );
-    }
+    const { id } = req.params as { id: string };
+    const { status } = req.body as { status: TransferStatus };
 
     const transfer = await TransferRequest.findById(id);
 

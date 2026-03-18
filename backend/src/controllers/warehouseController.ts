@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import mongoose from "mongoose";
 import { Warehouse } from "../models/Warehouse.ts";
 import { createHttpError } from "../utils/httpError.ts";
 
@@ -19,25 +18,14 @@ export async function createWarehouse(
 ) {
   try {
     const { name, location, stockLevel } = req.body as {
-      name?: string;
-      location?: string;
-      stockLevel?: number;
+      name: string;
+      location: string;
+      stockLevel: number;
     };
 
-    if (!name?.trim() || !location?.trim()) {
-      throw createHttpError(400, "Name and location are required.");
-    }
-
-    if (stockLevel === undefined || stockLevel < 0) {
-      throw createHttpError(
-        400,
-        "stockLevel must be a number greater than or equal to 0.",
-      );
-    }
-
     const warehouse = await Warehouse.create({
-      name: name.trim(),
-      location: location.trim(),
+      name,
+      location,
       stockLevel,
     });
 
@@ -68,19 +56,8 @@ export async function updateWarehouseStock(
   next: (error?: Error) => void,
 ) {
   try {
-    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const { stockLevel } = req.body as { stockLevel?: number };
-
-    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-      throw createHttpError(400, "Invalid warehouse id.");
-    }
-
-    if (stockLevel === undefined || stockLevel < 0) {
-      throw createHttpError(
-        400,
-        "stockLevel must be a number greater than or equal to 0.",
-      );
-    }
+    const { id } = req.params as { id: string };
+    const { stockLevel } = req.body as { stockLevel: number };
 
     const warehouse = await Warehouse.findByIdAndUpdate(
       id,

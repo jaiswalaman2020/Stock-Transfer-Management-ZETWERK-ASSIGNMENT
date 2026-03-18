@@ -37,7 +37,8 @@ Stock Transfer Management/
 │   │   ├── models/
 │   │   └── routes/
 │   ├── package.json
-│   └── tsconfig.json
+│   ├── tsconfig.json
+│   └── tsconfig.build.json
 ├── package.json
 └── README.md
 ```
@@ -67,6 +68,9 @@ cp backend/.env.example backend/.env
   - `PORT=5000`
   - `MONGODB_URI=mongodb://127.0.0.1:27017/stock_transfer_management`
   - `FRONTEND_ORIGIN=http://localhost:5173`
+  - `JSON_BODY_LIMIT=100kb`
+  - `RATE_LIMIT_WINDOW_MS=900000`
+  - `RATE_LIMIT_MAX_REQUESTS=200`
 
 ### 3) Run backend (Terminal 1)
 
@@ -83,7 +87,7 @@ npm run dev:frontend
 Frontend: `http://localhost:5173`
 Backend: `http://localhost:5000`
 
-
+Health check: `GET http://localhost:5000/api/health`
 
 ## API Endpoints
 
@@ -113,15 +117,17 @@ Backend: `http://localhost:5000`
 ## Quality and Validation
 
 - TypeScript used in both frontend and backend.
-- Input validations for warehouse and transfer creation.
+- Input validations for warehouse and transfer creation using `zod`.
 - Controlled transfer status transitions (`pending -> approved`).
 - Prevent transfer approval when source stock is insufficient.
-- CORS, centralized error handler, and health endpoint included.
+- Security hardening: `helmet`, API rate limiting, request sanitization, strict CORS allowlist.
+- Centralized error handler and health endpoint included.
 
 ## Deliverables
 
 - Live Application URL: Will add later
 - GitHub Repository Link: https://github.com/jaiswalaman2020/Stock-Transfer-Management-ZETWERK-ASSIGNMENT
+
 ## Useful Scripts
 
 Root:
@@ -130,6 +136,9 @@ Root:
 npm run install:all
 npm run dev:frontend
 npm run dev:backend
+npm run build:frontend
+npm run build:backend
+npm run build:all
 npm run build
 npm run lint
 npm run typecheck
@@ -148,5 +157,7 @@ Backend:
 ```bash
 npm --prefix backend run dev
 npm --prefix backend run start
+npm --prefix backend run build
+npm --prefix backend run start:prod
 npm --prefix backend run typecheck
 ```
