@@ -125,7 +125,7 @@ Health check: `GET http://localhost:5000/api/health`
 
 ## Deliverables
 
-- Live Application URL: Will add later
+- Live Application URL:https://stock-transfer-zetwerk.alan-james.com/
 - GitHub Repository Link: https://github.com/jaiswalaman2020/Stock-Transfer-Management-ZETWERK-ASSIGNMENT
 
 ## Useful Scripts
