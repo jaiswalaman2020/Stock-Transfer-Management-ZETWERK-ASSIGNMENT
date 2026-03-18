@@ -194,7 +194,8 @@ docker build -t stock-transfer-frontend ./frontend
 docker run --rm -p 8080:8080 stock-transfer-frontend
 ```
 
-## 9) Sample Test Flow
+- Live Application URL:https://stock-transfer-zetwerk.alan-james.com/
+- GitHub Repository Link: https://github.com/jaiswalaman2020/Stock-Transfer-Management-ZETWERK-ASSIGNMENT
 
 1. Create warehouse A with stock `100`.
 2. Create warehouse B with stock `30`.
