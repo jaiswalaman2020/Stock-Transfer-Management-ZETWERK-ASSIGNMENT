@@ -1,4 +1,5 @@
 import type { Dispatch, FormEvent, SetStateAction } from "react";
+import { Spinner } from "../ui/Spinner";
 import type { TransferFormState, Warehouse } from "../../types/domain";
 
 type CreateTransferFormProps = {
@@ -6,6 +7,7 @@ type CreateTransferFormProps = {
   setTransferForm: Dispatch<SetStateAction<TransferFormState>>;
   warehouses: Warehouse[];
   canCreateTransfer: boolean;
+  isSubmitting: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
 };
 
@@ -14,6 +16,7 @@ export function CreateTransferForm({
   setTransferForm,
   warehouses,
   canCreateTransfer,
+  isSubmitting,
   onSubmit,
 }: CreateTransferFormProps) {
   return (
@@ -89,8 +92,15 @@ export function CreateTransferForm({
             placeholder="Urgent stock movement"
           />
         </label>
-        <button type="submit" disabled={!canCreateTransfer}>
-          Create Transfer
+        <button type="submit" disabled={!canCreateTransfer || isSubmitting}>
+          {isSubmitting ? (
+            <span className="button-content">
+              <Spinner size="sm" />
+              Creating...
+            </span>
+          ) : (
+            "Create Transfer"
+          )}
         </button>
       </form>
     </article>

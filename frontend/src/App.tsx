@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { request } from "./api/client";
-import { CreateTransferForm } from "./components/forms/CreateTransferForm";
-import { CreateWarehouseForm } from "./components/forms/CreateWarehouseForm";
-import { TransferHistoryTable } from "./components/tables/TransferHistoryTable";
-import { WarehouseStockTable } from "./components/tables/WarehouseStockTable";
+import { request } from "./api/client.ts";
+import { CreateTransferForm } from "./components/forms/CreateTransferForm.tsx";
+import { CreateWarehouseForm } from "./components/forms/CreateWarehouseForm.tsx";
+import { TransferHistoryTable } from "./components/tables/TransferHistoryTable.tsx";
+import { WarehouseStockTable } from "./components/tables/WarehouseStockTable.tsx";
+import { Spinner } from "./components/ui/Spinner.tsx";
 import type {
   Transfer,
   TransferFormState,
   TransferStatus,
   Warehouse,
   WarehouseFormState,
-} from "./types/domain";
+} from "./types/domain.ts";
 import "./App.css";
 
 const statusOptions: TransferStatus[] = ["pending", "approved"];
@@ -38,6 +39,14 @@ function App() {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [transfers, setTransfers] = useState<Transfer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingWarehouse, setIsCreatingWarehouse] = useState(false);
+  const [isCreatingTransfer, setIsCreatingTransfer] = useState(false);
+  const [updatingWarehouseId, setUpdatingWarehouseId] = useState<string | null>(
+    null,
+  );
+  const [updatingTransferId, setUpdatingTransferId] = useState<string | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [warehouseForm, setWarehouseForm] =
     useState<WarehouseFormState>(initialWarehouseForm);
@@ -114,6 +123,8 @@ function App() {
       return;
     }
 
+    setIsCreatingWarehouse(true);
+
     try {
       await request<Warehouse>("/warehouses", {
         method: "POST",
@@ -131,11 +142,14 @@ function App() {
           ? createError.message
           : "Failed to create warehouse",
       );
+    } finally {
+      setIsCreatingWarehouse(false);
     }
   }
 
   async function handleUpdateStock(warehouseId: string) {
     setError(null);
+    setUpdatingWarehouseId(warehouseId);
 
     try {
       await request<Warehouse>(`/warehouses/${warehouseId}/stock`, {
@@ -152,6 +166,8 @@ function App() {
           ? updateError.message
           : "Failed to update stock",
       );
+    } finally {
+      setUpdatingWarehouseId(null);
     }
   }
 
@@ -167,6 +183,8 @@ function App() {
       );
       return;
     }
+
+    setIsCreatingTransfer(true);
 
     try {
       await request<Transfer>("/transfers", {
@@ -189,6 +207,8 @@ function App() {
           ? createError.message
           : "Failed to create transfer",
       );
+    } finally {
+      setIsCreatingTransfer(false);
     }
   }
 
@@ -197,6 +217,7 @@ function App() {
     status: TransferStatus,
   ) {
     setError(null);
+    setUpdatingTransferId(transferId);
 
     try {
       await request<Transfer>(`/transfers/${transferId}/status`, {
@@ -211,6 +232,8 @@ function App() {
           ? updateError.message
           : "Failed to update transfer status",
       );
+    } finally {
+      setUpdatingTransferId(null);
     }
   }
 
@@ -224,12 +247,20 @@ function App() {
       </header>
 
       {error && <p className="error">{error}</p>}
-      {isLoading && <p className="loading">Loading latest data...</p>}
+      {isLoading && (
+        <p className="loading">
+          <span className="loading-content">
+            <Spinner size="sm" />
+            Loading latest data...
+          </span>
+        </p>
+      )}
 
       <section className="grid two-columns">
         <CreateWarehouseForm
           warehouseForm={warehouseForm}
           setWarehouseForm={setWarehouseForm}
+          isSubmitting={isCreatingWarehouse}
           onSubmit={handleCreateWarehouse}
         />
         <CreateTransferForm
@@ -237,6 +268,7 @@ function App() {
           setTransferForm={setTransferForm}
           warehouses={warehouses}
           canCreateTransfer={canCreateTransfer}
+          isSubmitting={isCreatingTransfer}
           onSubmit={handleCreateTransfer}
         />
       </section>
@@ -245,6 +277,7 @@ function App() {
         warehouses={warehouses}
         stockDraft={stockDraft}
         setStockDraft={setStockDraft}
+        updatingWarehouseId={updatingWarehouseId}
         onUpdateStock={handleUpdateStock}
       />
 
@@ -252,6 +285,7 @@ function App() {
         transfers={transfers}
         statusOptions={statusOptions}
         allowedTransitions={allowedTransitions}
+        updatingTransferId={updatingTransferId}
         onStatusChange={handleStatusChange}
       />
     </main>

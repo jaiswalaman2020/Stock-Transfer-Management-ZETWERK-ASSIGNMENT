@@ -1,15 +1,18 @@
 import type { Dispatch, FormEvent, SetStateAction } from "react";
+import { Spinner } from "../ui/Spinner";
 import type { WarehouseFormState } from "../../types/domain";
 
 type CreateWarehouseFormProps = {
   warehouseForm: WarehouseFormState;
   setWarehouseForm: Dispatch<SetStateAction<WarehouseFormState>>;
+  isSubmitting: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
 };
 
 export function CreateWarehouseForm({
   warehouseForm,
   setWarehouseForm,
+  isSubmitting,
   onSubmit,
 }: CreateWarehouseFormProps) {
   return (
@@ -60,7 +63,16 @@ export function CreateWarehouseForm({
             placeholder="Enter initial stock"
           />
         </label>
-        <button type="submit">Create Warehouse</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <span className="button-content">
+              <Spinner size="sm" />
+              Creating...
+            </span>
+          ) : (
+            "Create Warehouse"
+          )}
+        </button>
       </form>
     </article>
   );

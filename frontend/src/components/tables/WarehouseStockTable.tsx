@@ -1,10 +1,12 @@
 import type { Dispatch, SetStateAction } from "react";
+import { Spinner } from "../ui/Spinner";
 import type { Warehouse } from "../../types/domain";
 
 type WarehouseStockTableProps = {
   warehouses: Warehouse[];
   stockDraft: Record<string, number>;
   setStockDraft: Dispatch<SetStateAction<Record<string, number>>>;
+  updatingWarehouseId: string | null;
   onUpdateStock: (warehouseId: string) => Promise<void>;
 };
 
@@ -12,6 +14,7 @@ export function WarehouseStockTable({
   warehouses,
   stockDraft,
   setStockDraft,
+  updatingWarehouseId,
   onUpdateStock,
 }: WarehouseStockTableProps) {
   return (
@@ -46,11 +49,19 @@ export function WarehouseStockTable({
                   />
                   <button
                     type="button"
+                    disabled={updatingWarehouseId === warehouse._id}
                     onClick={() => {
                       void onUpdateStock(warehouse._id);
                     }}
                   >
-                    Save
+                    {updatingWarehouseId === warehouse._id ? (
+                      <span className="button-content">
+                        <Spinner size="sm" />
+                        Saving...
+                      </span>
+                    ) : (
+                      "Save"
+                    )}
                   </button>
                 </td>
               </tr>
